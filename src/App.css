@@ -42,15 +42,25 @@
   align-items: center;
 }
 
+.target-container {
+  position: relative;
+  width: 300px;
+  margin: 10px 0 20px 0;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
 .target {
   position: relative;
   width: 300px;
   height: 300px;
   background-color: #f0f0f0;
   border-radius: 50%;
-  margin: 20px 0;
   cursor: crosshair;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  margin: 15px 0;
+  transform-origin: center center;
+  transition: transform 0.3s ease;
 }
 
 /* 同心円の的のスタイル */
@@ -125,8 +135,8 @@
 /* ショットマークのスタイル */
 .shot-mark {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 15px;
+  height: 15px;
   background-color: #ff6600;
   /* オレンジ色 */
   border-radius: 50%;
@@ -137,9 +147,9 @@
 .shot-mark.current {
   background-color: #ff9900;
   /* 明るいオレンジ色 */
-  width: 12px;
-  height: 12px;
-  box-shadow: 0 0 5px rgba(255, 153, 0, 0.7);
+  width: 18px;
+  height: 18px;
+  box-shadow: 0 0 8px rgba(255, 153, 0, 0.8);
   animation: pulse 1.5s infinite;
 }
 
@@ -165,12 +175,13 @@
 
 .shot-number {
   position: absolute;
-  bottom: -20px;
+  bottom: -22px;
   left: 0;
-  font-size: 10px;
+  font-size: 14px;
   font-weight: bold;
-  color: #333;
+  color: #ff6600;
   white-space: nowrap;
+  text-shadow: 0px 0px 2px white;
 }
 
 /* データセクション */
@@ -355,6 +366,56 @@ li:last-child {
   color: #666;
 }
 
+/* ズームコントロール */
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.zoom-button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #007bff;
+}
+
+.zoom-button:hover {
+  background-color: #0069d9;
+}
+
+.zoom-level {
+  font-weight: bold;
+  color: #333;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* 現在のセッションに戻るボタン */
+.return-button-container {
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.return-button {
+  background-color: #ff9900;
+  color: white;
+  font-weight: bold;
+}
+
+.return-button:hover {
+  background-color: #ff6600;
+}
+
+/* JSONデータ関連 */
 .export-button {
   background-color: #007bff;
   margin-top: 10px;
@@ -362,4 +423,19 @@ li:last-child {
 
 .export-button:hover {
   background-color: #0069d9;
+}
+
+.json-header-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.copy-button {
+  background-color: #28a745;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.copy-button:hover {
+  background-color: #218838;
 }

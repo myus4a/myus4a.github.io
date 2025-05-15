@@ -36,6 +36,7 @@ function App() {
   });
   const [sessions, setSessions] = useState<Session[]>([]);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [zoomLevel, setZoomLevel] = useState<number>(1.5); // デフォルトで1.5倍ズーム
   const targetRef = useRef<HTMLDivElement>(null);
 
   // 整数スコアの計算関数
@@ -112,6 +113,32 @@ function App() {
     } else {
       setSelectedSession(session);
     }
+  };
+
+  // ズームレベルを変更
+  const handleZoomIn = () => {
+    setZoomLevel(prev => Math.min(prev + 0.5, 3)); // 最大3倍まで
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel(prev => Math.max(prev - 0.5, 1)); // 最小1倍まで
+  };
+
+  // 現在のセッションに戻る
+  const returnToCurrentSession = () => {
+    setSelectedSession(null);
+  };
+
+  // JSONデータをクリップボードにコピー
+  const copyJsonToClipboard = () => {
+    navigator.clipboard.writeText(jsonData)
+      .then(() => {
+        alert('JSONデータをクリップボードにコピーしました');
+      })
+      .catch(err => {
+        console.error('コピーに失敗しました:', err);
+        alert('コピーに失敗しました。手動でコピーしてください。');
+      });
   };
 
   // JSON形式のデータを表示
@@ -191,63 +218,76 @@ function App() {
       <main className="app-main">
         <div className="target-section">
           <h2>現在のセッション: {currentSession.name}</h2>
-          <div
-            ref={targetRef}
-            className="target"
-            onClick={handleTargetClick}
-          >
-            {/* 同心円の的 */}
-            <div className="target-ring ring-10"></div>
-            <div className="target-ring ring-9"></div>
-            <div className="target-ring ring-8"></div>
-            <div className="target-ring ring-7"></div>
-            <div className="target-ring ring-6"></div>
-            <div className="target-ring ring-5"></div>
-            <div className="target-ring ring-4"></div>
-            <div className="target-ring ring-3"></div>
-            <div className="target-ring ring-2"></div>
-            <div className="target-ring ring-1"></div>
 
-            {/* 選択されたセッションのショットを表示 */}
-            {selectedSession && selectedSession.shots.map((shot) => (
-              <div
-                key={shot.id}
-                className="shot-mark selected-session"
-                style={{
-                  left: `${shot.x}px`,
-                  top: `${shot.y}px`
-                }}
-              >
-                <span className="shot-number">{shot.score.toFixed(1)}</span>
-              </div>
-            ))}
+          <div className="target-container">
+            <div className="zoom-controls">
+              <button onClick={handleZoomOut} className="zoom-button" title="縮小">-</button>
+              <span className="zoom-level">{Math.round(zoomLevel * 100)}%</span>
+              <button onClick={handleZoomIn} className="zoom-button" title="拡大">+</button>
+            </div>
 
-            {/* 現在のセッションのショットを表示（選択されたセッションがない場合のみ） */}
-            {!selectedSession && currentSession.shots.map((shot) => (
-              <div
-                key={shot.id}
-                className="shot-mark"
-                style={{
-                  left: `${shot.x}px`,
-                  top: `${shot.y}px`
-                }}
-              >
-                <span className="shot-number">{shot.score.toFixed(1)}</span>
-              </div>
-            ))}
+            <div
+              ref={targetRef}
+              className="target"
+              onClick={handleTargetClick}
+              style={{
+                transform: `scale(${zoomLevel})`,
+                transformOrigin: 'center center'
+              }}
+            >
+              {/* 同心円の的 */}
+              <div className="target-ring ring-10"></div>
+              <div className="target-ring ring-9"></div>
+              <div className="target-ring ring-8"></div>
+              <div className="target-ring ring-7"></div>
+              <div className="target-ring ring-6"></div>
+              <div className="target-ring ring-5"></div>
+              <div className="target-ring ring-4"></div>
+              <div className="target-ring ring-3"></div>
+              <div className="target-ring ring-2"></div>
+              <div className="target-ring ring-1"></div>
 
-            {/* 現在の一時的なショットマーク */}
-            {currentShot && (
-              <div
-                className="shot-mark current"
-                style={{
-                  left: `${currentShot.x}px`,
-                  top: `${currentShot.y}px`
-                }}
-              >
-                <span className="shot-number">{currentShot.integerScore}.?</span>
-              </div>
-            )}
+              {/* 選択されたセッションのショットを表示 */}
+              {selectedSession && selectedSession.shots.map((shot) => (
+                <div
+                  key={shot.id}
+                  className="shot-mark selected-session"
+                  style={{
+                    left: `${shot.x}px`,
+                    top: `${shot.y}px`
+                  }}
+                >
+                  <span className="shot-number">{shot.score.toFixed(1)}</span>
+                </div>
+              ))}
+
+              {/* 現在のセッションのショットを表示（選択されたセッションがない場合のみ） */}
+              {!selectedSession && currentSession.shots.map((shot) => (
+                <div
+                  key={shot.id}
+                  className="shot-mark"
+                  style={{
+                    left: `${shot.x}px`,
+                    top: `${shot.y}px`
+                  }}
+                >
+                  <span className="shot-number">{shot.score.toFixed(1)}</span>
+                </div>
+              ))}
+
+              {/* 現在の一時的なショットマーク */}
+              {currentShot && (
+                <div
+                  className="shot-mark current"
+                  style={{
+                    left: `${currentShot.x}px`,
+                    top: `${currentShot.y}px`
+                  }}
+                >
+                  <span className="shot-number">{currentShot.integerScore}.?</span>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* 小数点スコア選択UI */}
@@ -300,6 +340,13 @@ function App() {
 
           <div className="past-sessions">
             <h3>過去のセッション</h3>
+            {selectedSession && (
+              <div className="return-button-container">
+                <button onClick={returnToCurrentSession} className="return-button">
+                  現在のセッションに戻る
+                </button>
+              </div>
+            )}
             {sessions.length === 0 ? (
               <p>まだ保存されたセッションがありません</p>
             ) : (
@@ -336,7 +383,10 @@ function App() {
           <div className="json-display-container">
             <div className="json-display-header">
               <h3>セッションデータ (JSON形式)</h3>
-              <button className="close-button" onClick={closeJsonDisplay}>閉じる</button>
+              <div className="json-header-buttons">
+                <button className="copy-button" onClick={copyJsonToClipboard}>コピー</button>
+                <button className="close-button" onClick={closeJsonDisplay}>閉じる</button>
+              </div>
             </div>
             <pre className="json-display">{jsonData}</pre>
             <div className="json-display-footer">
