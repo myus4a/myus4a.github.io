@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import './App.css'
 
 interface Shot {
@@ -372,7 +372,7 @@ function App() {
               <p>まだショットがありません</p>
             ) : (
               <ul>
-                {currentSession.shots.map((shot, index) => (
+                {currentSession.shots.map((shot, _index) => (
                   <li key={shot.id}>
                     ショット {shot.id}: スコア={shot.score.toFixed(1)}, X={shot.x.toFixed(1)}, Y={shot.y.toFixed(1)}
                   </li>
