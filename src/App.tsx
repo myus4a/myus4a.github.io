@@ -324,27 +324,34 @@ function App() {
                 </div>
               )}
             </div>
+            {/* 小数点スコア選択UI - 射撃痕の直近に表示 */}
+            {currentShot && (
+              <div
+                className="decimal-score-selector-overlay"
+                style={{
+                  position: 'absolute',
+                  top: `${currentShot.y - 15}px`, /* 射撃痕の真上に表示 */
+                  left: `${currentShot.x - 50}px`,
+                  zIndex: 100
+                }}
+              >
+                <div className="score-message-small">
+                  {currentShot.integerScore}.?
+                </div>
+                <div className="decimal-buttons-small">
+                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(decimal => (
+                    <button
+                      key={decimal}
+                      className="decimal-button-small"
+                      onClick={() => selectDecimalScore(decimal)}
+                    >
+                      {decimal}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-
-          {/* 小数点スコア選択UI */}
-          {currentShot && (
-            <div className="decimal-score-selector">
-              <div className="score-message">
-                整数スコア: <strong>{currentShot.integerScore}</strong> - 小数点以下の値を選択:
-              </div>
-              <div className="decimal-buttons">
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map(decimal => (
-                  <button
-                    key={decimal}
-                    className="decimal-button"
-                    onClick={() => selectDecimalScore(decimal)}
-                  >
-                    {decimal}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
 
           <div className="session-controls">
             <button

@@ -46,7 +46,8 @@
   position: relative;
   width: 300px;
   margin: 10px 0 20px 0;
-  overflow: hidden;
+  overflow: visible;
+  /* 的の外側にUIを表示できるように変更 */
   border-radius: 10px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 }
@@ -129,7 +130,7 @@
 .ring-1 {
   width: 10%;
   height: 10%;
-  background-color: #ff0000;
+  background-color: #0066ff;
 }
 
 /* ショットマークのスタイル */
@@ -239,9 +240,26 @@
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
+/* 小数点スコア選択UI（的の上に表示するオーバーレイ版） */
+.decimal-score-selector-overlay {
+  padding: 5px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  width: 100px;
+  text-align: center;
+  pointer-events: auto;
+}
+
 .score-message {
   margin-bottom: 10px;
   font-size: 16px;
+}
+
+.score-message-small {
+  margin-bottom: 2px;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 .decimal-buttons {
@@ -266,6 +284,35 @@
 }
 
 .decimal-button:hover {
+  background-color: #3367d6;
+  transform: scale(1.1);
+}
+
+/* 小さいサイズの小数点ボタン（オーバーレイ表示用） */
+.decimal-buttons-small {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.decimal-button-small {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: bold;
+  background-color: #4285f4;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.1s, background-color 0.3s;
+  padding: 0;
+}
+
+.decimal-button-small:hover {
   background-color: #3367d6;
   transform: scale(1.1);
 }

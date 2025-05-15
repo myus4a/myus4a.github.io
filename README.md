@@ -1,54 +1,72 @@
-# React + TypeScript + Vite
+# ビームライフル的記録アプリ
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ビームライフルの射撃位置とスコアを記録するためのWebアプリケーションです。ブラウザ上で動作し、サーバー通信を必要としないため、GitHub Pagesでの公開に適しています。
 
-Currently, two official plugins are available:
+## 機能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **射撃位置の記録**: 的をクリックするだけで射撃位置を記録
+- **自動スコア計算**: 同心円の位置に基づいて自動的にスコアを計算（1-10点）
+- **小数点以下の手動入力**: 小数点以下のスコア（0.0-0.9）を手動で入力可能
+- **セッション管理**: 複数のセッションを保存・閲覧可能
+- **データエクスポート**: セッションデータをJSON形式で表示・コピー可能
 
-## Expanding the ESLint configuration
+## 使い方
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. **射撃位置の記録**:
+   - 的の任意の場所をクリックすると、その位置に射撃痕が表示されます
+   - 自動的に整数スコア（1-10点）が計算されます
+   - クリック位置の近くに小数点入力UIが表示されます
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+2. **小数点以下のスコア入力**:
+   - 整数スコアが自動計算された後、小数点以下の値（0-9）を選択します
+   - 選択すると、完全なスコア（例: 10.5）がセッションに記録されます
+
+3. **セッションの保存**:
+   - 射撃記録が完了したら「セッションを保存」ボタンをクリックします
+   - 保存されたセッションは「過去のセッション」欄で確認できます
+
+4. **過去のセッションの閲覧**:
+   - 「過去のセッション」欄で閲覧したいセッションをクリックします
+   - セッションの射撃位置とスコアが的に表示されます
+   - 「現在のセッションに戻る」ボタンで新しい記録に戻れます
+
+5. **データのエクスポート**:
+   - 「セッションデータをJSONで表示」ボタンをクリックします
+   - 表示されたJSONデータを「コピー」ボタンでクリップボードにコピーできます
+
+## 技術仕様
+
+- React + TypeScript
+- Vite (開発サーバー・ビルドツール)
+- CSSによるスタイリング
+- ブラウザのローカルストレージを使用したデータ保存（今後の拡張予定）
+
+## 開発者向け情報
+
+### 開発環境のセットアップ
+
+```bash
+# リポジトリのクローン
+git clone https://github.com/your-username/beam-rifle-target-app.git
+cd beam-rifle-target-app
+
+# 依存パッケージのインストール
+npm install
+
+# 開発サーバーの起動
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### ビルド方法
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# 本番用ビルドの作成
+npm run build
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+# ビルド結果のプレビュー
+npm run preview
 ```
+
+## ライセンス
+
+MIT License
