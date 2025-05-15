@@ -36,12 +36,11 @@ function App() {
   });
   const [sessions, setSessions] = useState<Session[]>([]);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
-  const [zoomLevel, setZoomLevel] = useState<number>(1.5); // デフォルトで1.5倍ズーム
   const targetRef = useRef<HTMLDivElement>(null);
 
   // 整数スコアの計算関数
   const calculateIntegerScore = (x: number, y: number): number => {
-    // 的の中心
+    // 的の中心（実際の的のサイズは300x300pxの円）
     const centerX = 150;
     const centerY = 150;
 
@@ -50,26 +49,69 @@ function App() {
     const dy = y - centerY;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    // 的の判定範囲（的を囲む四角形の少し外まで）
-    // 的のサイズは300x300px、判定範囲は20px大きくする
-    const targetSize = 300;
-    const judgementArea = targetSize / 2 + 20; // 半径+20px
+    console.log(`Distance from center: ${distance}px`);
 
-    // 判定範囲外のクリックは0点
-    if (Math.abs(dx) > judgementArea || Math.abs(dy) > judgementArea) {
+    // 的の半径（的のサイズは300x300px）
+    const radius = 150;
+
+    // 的の外側をクリックした場合は0点
+    if (distance > radius) {
       return 0;
     }
 
-    // 的のサイズを超えたら0点
-    const radius = targetSize / 2;
-    if (distance > radius) return 0;
+    // CSSで定義されたリングのサイズに合わせてスコア計算
+    // 各リングのサイズは的の半径に対する割合で定義されている
 
-    // 距離に基づいてスコアを計算（10 - 何番目のリングか）
-    const ringWidth = radius / 10;
-    const ring = Math.ceil(distance / ringWidth);
-    const score = 11 - ring;
-
-    return Math.max(0, Math.min(10, score)); // 0~10の範囲に制限
+    // ring-1 (赤い中心、半径の10%) - 10点
+    if (distance <= radius * 0.1) {
+      console.log("赤い中心部分: 10点");
+      return 10;
+    }
+    // ring-2 (黒いリング、半径の20%) - 9点
+    else if (distance <= radius * 0.2) {
+      console.log("黒いリング2: 9点");
+      return 9;
+    }
+    // ring-3 (白いリング、半径の30%) - 8点
+    else if (distance <= radius * 0.3) {
+      console.log("白いリング3: 8点");
+      return 8;
+    }
+    // ring-4 (黒いリング、半径の40%) - 7点
+    else if (distance <= radius * 0.4) {
+      console.log("黒いリング4: 7点");
+      return 7;
+    }
+    // ring-5 (白いリング、半径の50%) - 6点
+    else if (distance <= radius * 0.5) {
+      console.log("白いリング5: 6点");
+      return 6;
+    }
+    // ring-6 (黒いリング、半径の60%) - 5点
+    else if (distance <= radius * 0.6) {
+      console.log("黒いリング6: 5点");
+      return 5;
+    }
+    // ring-7 (白いリング、半径の70%) - 4点
+    else if (distance <= radius * 0.7) {
+      console.log("白いリング7: 4点");
+      return 4;
+    }
+    // ring-8 (黒いリング、半径の80%) - 3点
+    else if (distance <= radius * 0.8) {
+      console.log("黒いリング8: 3点");
+      return 3;
+    }
+    // ring-9 (白いリング、半径の90%) - 2点
+    else if (distance <= radius * 0.9) {
+      console.log("白いリング9: 2点");
+      return 2;
+    }
+    // ring-10 (黒いリング、半径の100%) - 1点
+    else {
+      console.log("黒いリング10: 1点");
+      return 1;
+    }
   };
 
   // 小数点以下のスコアを選択
@@ -115,14 +157,6 @@ function App() {
     }
   };
 
-  // ズームレベルを変更
-  const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(prev + 0.5, 3)); // 最大3倍まで
-  };
-
-  const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(prev - 0.5, 1)); // 最小1倍まで
-  };
 
   // 現在のセッションに戻る
   const returnToCurrentSession = () => {
@@ -195,8 +229,20 @@ function App() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
+    // ターゲットの中心位置（150, 150）との比較用にログ出力
+    const centerX = 150;
+    const centerY = 150;
+    const dx = x - centerX;
+    const dy = y - centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    console.log(`クリック位置: X=${x.toFixed(1)}, Y=${y.toFixed(1)}`);
+    console.log(`中心からの距離: ${distance.toFixed(1)}px`);
+    console.log(`中心からのオフセット: dX=${dx.toFixed(1)}, dY=${dy.toFixed(1)}`);
+
     // 整数スコアを計算
     const integerScore = calculateIntegerScore(x, y);
+    console.log(`計算されたスコア: ${integerScore}`);
 
     // 現在のショットを設定
     setCurrentShot({
@@ -220,20 +266,10 @@ function App() {
           <h2>現在のセッション: {currentSession.name}</h2>
 
           <div className="target-container">
-            <div className="zoom-controls">
-              <button onClick={handleZoomOut} className="zoom-button" title="縮小">-</button>
-              <span className="zoom-level">{Math.round(zoomLevel * 100)}%</span>
-              <button onClick={handleZoomIn} className="zoom-button" title="拡大">+</button>
-            </div>
-
             <div
               ref={targetRef}
               className="target"
               onClick={handleTargetClick}
-              style={{
-                transform: `scale(${zoomLevel})`,
-                transformOrigin: 'center center'
-              }}
             >
               {/* 同心円の的 */}
               <div className="target-ring ring-10"></div>
