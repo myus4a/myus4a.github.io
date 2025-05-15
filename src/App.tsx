@@ -35,6 +35,7 @@ function App() {
     totalScore: 0
   });
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const targetRef = useRef<HTMLDivElement>(null);
 
   // 整数スコアの計算関数
@@ -48,14 +49,22 @@ function App() {
     const dy = y - centerY;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    // 150pxを10リングの直径とした場合のスコア計算
-    // 外から内側に向かって1~10点
-    const radius = 150;
-    const ringWidth = radius / 10;
+    // 的の判定範囲（的を囲む四角形の少し外まで）
+    // 的のサイズは300x300px、判定範囲は20px大きくする
+    const targetSize = 300;
+    const judgementArea = targetSize / 2 + 20; // 半径+20px
 
-    if (distance > radius) return 0; // 的の外
+    // 判定範囲外のクリックは0点
+    if (Math.abs(dx) > judgementArea || Math.abs(dy) > judgementArea) {
+      return 0;
+    }
+
+    // 的のサイズを超えたら0点
+    const radius = targetSize / 2;
+    if (distance > radius) return 0;
 
     // 距離に基づいてスコアを計算（10 - 何番目のリングか）
+    const ringWidth = radius / 10;
     const ring = Math.ceil(distance / ringWidth);
     const score = 11 - ring;
 
@@ -88,8 +97,45 @@ function App() {
       totalScore: newTotalScore
     });
 
+    // 選択中のセッションをリセット
+    setSelectedSession(null);
+
     // 現在のショットをリセット
     setCurrentShot(null);
+  };
+
+  // セッションを選択
+  const selectSession = (session: Session) => {
+    // 既に選択されている場合は選択解除
+    if (selectedSession && selectedSession.id === session.id) {
+      setSelectedSession(null);
+    } else {
+      setSelectedSession(session);
+    }
+  };
+
+  // JSON形式のデータを表示
+  const [showJsonData, setShowJsonData] = useState(false);
+  const [jsonData, setJsonData] = useState('');
+
+  const displaySessionsAsJson = () => {
+    // エクスポートするデータを準備
+    const dataToExport = {
+      currentSession,
+      pastSessions: sessions
+    };
+
+    // JSONに変換して整形
+    const jsonString = JSON.stringify(dataToExport, null, 2);
+
+    // JSONデータをステートに設定
+    setJsonData(jsonString);
+    setShowJsonData(true);
+  };
+
+  // JSONデータ表示を閉じる
+  const closeJsonDisplay = () => {
+    setShowJsonData(false);
   };
 
   // セッションの保存
@@ -111,6 +157,10 @@ function App() {
 
   // 的をクリックした時の処理
   const handleTargetClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // 選択したセッションがある場合は射撃できない
+    if (selectedSession) return;
+
+    // 既に射撃中の場合は追加の射撃を禁止
     if (!targetRef.current || currentShot) return;
 
     // クリック位置を計算（的の左上を原点として）
@@ -158,8 +208,22 @@ function App() {
             <div className="target-ring ring-2"></div>
             <div className="target-ring ring-1"></div>
 
-            {/* ショット（命中点）の表示 */}
-            {currentSession.shots.map((shot) => (
+            {/* 選択されたセッションのショットを表示 */}
+            {selectedSession && selectedSession.shots.map((shot) => (
+              <div
+                key={shot.id}
+                className="shot-mark selected-session"
+                style={{
+                  left: `${shot.x}px`,
+                  top: `${shot.y}px`
+                }}
+              >
+                <span className="shot-number">{shot.score.toFixed(1)}</span>
+              </div>
+            ))}
+
+            {/* 現在のセッションのショットを表示（選択されたセッションがない場合のみ） */}
+            {!selectedSession && currentSession.shots.map((shot) => (
               <div
                 key={shot.id}
                 className="shot-mark"
@@ -241,7 +305,11 @@ function App() {
             ) : (
               <div className="session-list">
                 {sessions.map((session) => (
-                  <div key={session.id} className="session-item">
+                  <div
+                    key={session.id}
+                    className={`session-item ${selectedSession && selectedSession.id === session.id ? 'selected' : ''}`}
+                    onClick={() => selectSession(session)}
+                  >
                     <h4>{session.name} ({session.date.toLocaleDateString()})</h4>
                     <div>合計ショット数: {session.shots.length}</div>
                     <div>合計スコア: {session.totalScore.toFixed(1)}</div>
@@ -252,6 +320,31 @@ function App() {
           </div>
         </div>
       </main>
+
+      {/* JSON表示／エクスポートボタン */}
+      <footer className="app-footer">
+        <button
+          className="export-button"
+          onClick={displaySessionsAsJson}
+          disabled={currentSession.shots.length === 0 && sessions.length === 0}
+        >
+          セッションデータをJSONで表示
+        </button>
+
+        {/* JSONデータの表示エリア */}
+        {showJsonData && (
+          <div className="json-display-container">
+            <div className="json-display-header">
+              <h3>セッションデータ (JSON形式)</h3>
+              <button className="close-button" onClick={closeJsonDisplay}>閉じる</button>
+            </div>
+            <pre className="json-display">{jsonData}</pre>
+            <div className="json-display-footer">
+              <p>上記のJSONデータをコピーして保存してください</p>
+            </div>
+          </div>
+        )}
+      </footer>
     </div>
   )
 }

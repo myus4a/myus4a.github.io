@@ -127,18 +127,26 @@
   position: absolute;
   width: 10px;
   height: 10px;
-  background-color: red;
+  background-color: #ff6600;
+  /* オレンジ色 */
   border-radius: 50%;
   transform: translate(-50%, -50%);
   z-index: 10;
 }
 
 .shot-mark.current {
-  background-color: #ff6600;
+  background-color: #ff9900;
+  /* 明るいオレンジ色 */
   width: 12px;
   height: 12px;
-  box-shadow: 0 0 5px rgba(255, 102, 0, 0.7);
+  box-shadow: 0 0 5px rgba(255, 153, 0, 0.7);
   animation: pulse 1.5s infinite;
+}
+
+.shot-mark.selected-session {
+  background-color: #ff3300;
+  /* 赤みがかったオレンジ */
+  box-shadow: 0 0 5px rgba(255, 51, 0, 0.7);
 }
 
 @keyframes pulse {
@@ -191,6 +199,19 @@
   margin-bottom: 10px;
   border-radius: 5px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.session-item:hover {
+  background-color: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.session-item.selected {
+  background-color: #e6f7ff;
+  border-left: 4px solid #1890ff;
 }
 
 .session-item h4 {
@@ -277,4 +298,68 @@ li {
 
 li:last-child {
   border-bottom: none;
+}
+
+/* JSONデータ表示エリア */
+.app-footer {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.json-display-container {
+  margin-top: 20px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 15px;
+  text-align: left;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.json-display-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+.json-display-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.close-button {
+  background-color: #6c757d;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.json-display {
+  white-space: pre-wrap;
+  overflow: auto;
+  background-color: #f1f1f1;
+  padding: 15px;
+  border-radius: 5px;
+  font-family: monospace;
+  font-size: 14px;
+  max-height: 300px;
+  margin: 0;
+}
+
+.json-display-footer {
+  margin-top: 15px;
+  font-size: 14px;
+  font-style: italic;
+  color: #666;
+}
+
+.export-button {
+  background-color: #007bff;
+  margin-top: 10px;
+}
+
+.export-button:hover {
+  background-color: #0069d9;
 }
